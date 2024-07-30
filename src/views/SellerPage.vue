@@ -1,6 +1,4 @@
 <template>
-  <div>12312</div>
-
   <Seller></Seller>
 </template>
 

@@ -2,6 +2,11 @@ import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import axios from 'axios'
+
+import './assets/css/golbal.less'
+//请求基地址
+axios.defaults.baseURL = 'http://127.0.0.1:8848/api/'
 
 // 引入echarts
 import echarts from '@/myEcharts/echarts'

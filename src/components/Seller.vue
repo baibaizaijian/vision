@@ -44,6 +44,7 @@ const totalPage = computed(() =>
 
 const initChart = () => {
   chartInstance.value = echarts.init(chart.value, 'chalk')
+
   //鼠标移动移除效果
   chartInstance.value.on('mouseover', () => {
     clearInterval(timer.value)
@@ -67,6 +68,8 @@ const getData = async () => {
 }
 
 const updated = () => {
+  const titleFontSize = (chart.value!.offsetWidth / 100) * 3.6
+  const barWidth = chart.value!.offsetHeight / 16
   const showDate = chartData.value.slice(
     (state.currentPage - 1) * state.pageSize,
     state.currentPage * state.pageSize
@@ -79,7 +82,7 @@ const updated = () => {
     title: {
       text: '▎商家销售统计',
       textStyle: {
-        fontSize: 60
+        fontSize: titleFontSize
       },
       left: 20,
       top: 20
@@ -104,7 +107,7 @@ const updated = () => {
         type: 'line',
         z: 0,
         lineStyle: {
-          width: 66,
+          width: titleFontSize,
           color: '#2d3443'
         }
       }
@@ -112,8 +115,9 @@ const updated = () => {
     series: [
       {
         type: 'bar',
+        barWidth: barWidth,
         data: values,
-        barWidth: 60,
+
         label: {
           show: true,
           position: 'right',
@@ -123,7 +127,7 @@ const updated = () => {
         },
         //设置渐变
         itemStyle: {
-          barBorderRadius: [0, 30, 30, 0],
+          borderRadius: [0, titleFontSize / 2, titleFontSize / 2, 0],
           opacity: 0.8,
           color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
             {
@@ -156,14 +160,21 @@ const handleInterval = () => {
   }, 3000)
 }
 
-//清除定时器
-onBeforeUnmount(() => {
-  clearInterval(timer.value)
-})
+const screenAdapter = () => {
+  updated()
+  chartInstance.value?.resize()
+}
 
 onMounted(() => {
   initChart()
   getData()
+  window.addEventListener('resize', screenAdapter)
+})
+
+//清除定时器
+onBeforeUnmount(() => {
+  clearInterval(timer.value)
+  window.removeEventListener('resize', screenAdapter)
 })
 </script>
 

@@ -5,12 +5,22 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, reactive, computed, onBeforeUnmount } from 'vue'
+import {
+  onMounted,
+  ref,
+  reactive,
+  computed,
+  onBeforeUnmount,
+  triggerRef
+} from 'vue'
 import { defineComponent } from 'vue'
 import instance from '@/utils/request'
 import * as echarts from 'echarts'
 import type { ECharts } from 'echarts'
-
+import chalk from '@/assets/theme/chalk'
+import TextStyleMixin from 'echarts/types/src/model/mixin/textStyle.js'
+import Grid from 'echarts/types/src/coord/cartesian/Grid.js'
+// 引入主题
 // 定义图表数据的类型
 interface SellerData {
   name: string
@@ -20,7 +30,7 @@ interface SellerData {
 defineComponent({
   name: 'SellerComponent'
 })
-
+echarts.registerTheme('chalk', chalk)
 // 引用 DOM 元素
 const chart = ref<HTMLElement | null>(null)
 // 引用 ECharts 实例
@@ -33,7 +43,7 @@ const totalPage = computed(() =>
 )
 
 const initChart = () => {
-  chartInstance.value = echarts.init(chart.value)
+  chartInstance.value = echarts.init(chart.value, 'chalk')
   //鼠标移动移除效果
   chartInstance.value.on('mouseover', () => {
     clearInterval(timer.value)
@@ -67,7 +77,19 @@ const updated = () => {
 
   const option = {
     title: {
-      text: '▎商家销售统计'
+      text: '▎商家销售统计',
+      textStyle: {
+        fontSize: 60
+      },
+      left: 20,
+      top: 20
+    },
+    grid: {
+      top: '20%',
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true //包含坐标轴文字
     },
     xAxis: {
       type: 'value'
@@ -76,10 +98,44 @@ const updated = () => {
       type: 'category',
       data: sellers
     },
+    tooltip: {
+      trigger: 'item',
+      axisPointer: {
+        type: 'line',
+        z: 0,
+        lineStyle: {
+          width: 66,
+          color: '#2d3443'
+        }
+      }
+    },
     series: [
       {
         type: 'bar',
-        data: values
+        data: values,
+        barWidth: 60,
+        label: {
+          show: true,
+          position: 'right',
+          textStyle: {
+            color: 'white'
+          }
+        },
+        //设置渐变
+        itemStyle: {
+          barBorderRadius: [0, 30, 30, 0],
+          opacity: 0.8,
+          color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+            {
+              offset: 0,
+              color: '#5052EE'
+            },
+            {
+              offset: 1,
+              color: '#AB6EE5'
+            }
+          ])
+        }
       }
     ]
   }
